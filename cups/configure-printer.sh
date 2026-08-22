@@ -19,10 +19,6 @@ find_model() {
     exit 1
   fi
 
-  if ! lpinfo -m | awk '{ print $1 }' | grep -Fxq "$model"; then
-    echo "Configured PRINTER_MODEL is unavailable: $model" >&2
-    exit 1
-  fi
   printf '%s\n' "$model"
 }
 
