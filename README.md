@@ -1,32 +1,32 @@
 # hs-print
 
-Домашний шлюз AirPrint для Epson L3250.
+Server-side AirPrint gateway for an Epson L3250.
 
-Проект даёт iPhone/iPad обнаруживать принтер в домашней сети и печатать по AirPrint. Ubuntu-сервер принимает задания через CUPS и передаёт их Epson L3250 по IPP.
+Lets iPhone/iPad discover the printer on the local network and print over AirPrint. An Ubuntu server accepts jobs through CUPS and forwards them to the Epson L3250 over IPP.
 
-## Статус
+## Status
 
-Рабочее решение: контейнеры CUPS и Avahi, очередь Epson и диагностические команды. Печать с iPhone подтверждена.
+Working: CUPS and Avahi containers, the Epson queue, and diagnostic commands. Printing from iPhone is confirmed.
 
-## Быстрый старт
+## Quick start
 
 ```bash
-cp .env.example .env   # заполнить PRINTER_URI, LAN_SUBNET, AVAHI_INTERFACES и имена
+cp .env.example .env   # fill in PRINTER_URI, LAN_SUBNET, AVAHI_INTERFACES and the names
 make up
 make status
 ```
 
-Если на хосте активен firewall (UFW и т.п.), откройте TCP/631 для локальной сети — см. [Эксплуатация](docs/operations.md).
+If the host runs a firewall (UFW, etc.), open TCP/631 for the local network — see [Operations](docs/operations.md).
 
-## Документация
+## Documentation
 
-- [Архитектура](docs/architecture.md)
-- [Решения и допущения](docs/decisions.md)
-- [Эксплуатация](docs/operations.md)
+- [Architecture](docs/architecture.md)
+- [Decisions and assumptions](docs/decisions.md)
+- [Operations](docs/operations.md)
 
-## Целевой стек
+## Target stack
 
-- Docker Compose в Ubuntu;
-- CUPS с драйвером Epson ESC/P-R;
-- Avahi для mDNS/Bonjour и обнаружения AirPrint;
-- Epson L3250 в домашней Wi-Fi-сети.
+- Docker Compose on Ubuntu
+- CUPS with the Epson ESC/P-R driver
+- Avahi for mDNS/Bonjour and AirPrint discovery
+- Epson L3250 on the local network

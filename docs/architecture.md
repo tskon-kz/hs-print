@@ -1,43 +1,42 @@
-# Архитектура
+# Architecture
 
-## Компоненты
+## Components
 
-| Компонент | Назначение | Сеть/хранение |
+| Component | Purpose | Network / storage |
 | --- | --- | --- |
-| iPhone / iPad | Находит и отправляет задания AirPrint | Домашняя LAN |
-| Avahi | Публикует очередь CUPS через mDNS/Bonjour | Host network для multicast DNS |
-| CUPS | Принимает IPP-задания, обрабатывает документ и управляет очередью | Host network; конфигурация в Docker volume |
-| Epson L3250 | Физически печатает документ | IPP по фиксированному LAN-адресу |
+| iPhone / iPad | Discovers and submits AirPrint jobs | Local LAN |
+| Avahi | Publishes the CUPS queue over mDNS/Bonjour | Host network for multicast DNS |
+| CUPS | Accepts IPP jobs, processes the document, manages the queue | Host network; configuration in a Docker volume |
+| Epson L3250 | Physically prints the document | IPP over a fixed LAN address |
 
-## Сетевая схема
+## Network flow
 
 ```text
 iPhone/iPad
-    │  mDNS: поиск AirPrint
+    │  mDNS: AirPrint discovery
     ▼
-Avahi на Ubuntu (Docker, host network)
-    │  IPP: задание на очередь CUPS
+Avahi on Ubuntu (Docker, host network)
+    │  IPP: job to the CUPS queue
     ▼
 CUPS + Epson ESC/P-R (Docker, host network)
     │  IPP: PRINTER_URI
     ▼
-Epson L3250 (192.168.1.207)
+Epson L3250 (PRINTER_URI)
 ```
 
-`network_mode: host` выбран для сервисов, участвующих в AirPrint, поскольку mDNS использует multicast UDP/5353 и должен быть виден устройствам в физической локальной сети. При таком режиме порты контейнера являются портами Ubuntu-хоста.
+`network_mode: host` is used for the AirPrint services because mDNS relies on multicast UDP/5353 and must be visible to devices on the physical LAN. In this mode the container ports are the Ubuntu host's ports.
 
-## Данные и конфигурация
+## Data and configuration
 
-- `.env` содержит локальные параметры и не коммитится;
-- `.env.example` содержит безопасные примеры параметров;
-- CUPS state хранится в именованном Docker volume;
-- конфигурации образов и скрипты находятся в репозитории;
-- в репозитории не хранятся пароли, ключи и резервные копии заданий печати.
+- `.env` holds local parameters and is not committed;
+- `.env.example` holds safe example parameters;
+- CUPS state is stored in a named Docker volume;
+- image configuration and scripts live in the repository;
+- no passwords, keys, or print-job backups are stored in the repository.
 
-## Безопасность
+## Security
 
-- AirPrint и администрирование доступны только из доверенной домашней сети;
-- сервис не публикуется в интернет и не требует проброса портов;
-- доступ к веб-интерфейсу CUPS ограничивается конфигурацией;
-- обновления выполняются контролируемо: pull/build, перезапуск, проверка тестовой печати.
-
+- AirPrint and administration are reachable only from the trusted local network;
+- the service is not exposed to the internet and needs no port forwarding;
+- access to the CUPS web interface is restricted by configuration;
+- updates are controlled: pull/build, restart, verify with a test print.

@@ -1,10 +1,11 @@
-# Решения и допущения
+# Decisions and assumptions
 
-## Принятые решения
+## Decisions
 
-1. Используем Docker Compose, а не установку CUPS/Avahi непосредственно в Ubuntu: конфигурация переносима, а обновление и резервное копирование проще воспроизводить.
-2. Используем отдельные контейнеры CUPS и Avahi: у сервисов разные обязанности и независимые журналы/циклы обновления.
-3. Используем host network: это наиболее надёжный режим для AirPrint/mDNS в одной домашней сети.
-4. Адрес и URI принтера задаются через `.env`, чтобы смена принтера или IP не требовала пересборки образа.
-5. Поддерживается одна очередь Epson L3250; расширение до нескольких принтеров не входит в текущий объём.
-6. Avahi работает без D-Bus (`enable-dbus=no`) и публикует статический `airprint.service`, а не полагается на DNS-SD самого CUPS.
+1. Use Docker Compose instead of installing CUPS/Avahi directly on Ubuntu: the configuration is portable, and updates and backups are easier to reproduce.
+2. Use separate CUPS and Avahi containers: the services have distinct responsibilities and independent logs/update cycles.
+3. Use host networking: it is the most reliable mode for AirPrint/mDNS on a single local network.
+4. The printer address and URI are set via `.env`, so changing the printer or IP needs no image rebuild.
+5. A single queue is supported (one printer at a time); multiple printers at once are out of scope.
+6. The printer model is set via `.env` (`PRINTER_URI`, `PRINTER_NAME`, `PRINTER_MODEL`, `PRINTER_PRODUCT`). The Epson ESC/P-R driver (`printer-driver-escpr`) is installed by default; L3250 is the default, tested model. Another Epson ESC/P-R printer works by editing `.env`; a different vendor requires adding its driver to `cups/Dockerfile`.
+7. Avahi runs without D-Bus (`enable-dbus=no`) and publishes a static `airprint.service` rather than relying on CUPS's own DNS-SD.

@@ -3,7 +3,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 set -a
-# .env is local, user-maintained configuration; it is intentionally not tracked.
 source .env
 set +a
 

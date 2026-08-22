@@ -1,39 +1,39 @@
-# Эксплуатация
+# Operations
 
-## Первый запуск на Ubuntu
+## First run on Ubuntu
 
-1. Установите Docker Engine с Docker Compose plugin.
-2. Убедитесь, что на хосте нет работающих CUPS или Avahi: они конфликтуют с портом TCP/631 и mDNS UDP/5353.
-3. Создайте локальную конфигурацию: `cp .env.example .env`.
-4. Проверьте `PRINTER_URI`, `LAN_SUBNET` и имя принтера в `.env`. Закрепите IP принтера в DHCP роутера.
-5. Выполните `make up`, затем `make status`.
+1. Install Docker Engine with the Docker Compose plugin.
+2. Make sure no CUPS or Avahi is running on the host: they conflict on TCP/631 and mDNS UDP/5353.
+3. Create the local configuration: `cp .env.example .env`.
+4. Set `PRINTER_URI`, `LAN_SUBNET`, and the printer names in `.env`. Reserve the printer IP in the router's DHCP.
+5. Run `make up`, then `make status`.
 
-`network_mode: host` обязателен для обнаружения через Bonjour. Запускайте стек на Linux; Docker Desktop на macOS/Windows не воспроизводит сетевую модель целевого Ubuntu-хоста.
+`network_mode: host` is required for Bonjour discovery. Run the stack on Linux; Docker Desktop on macOS/Windows does not reproduce the target Ubuntu host's network model.
 
-### Firewall (обязательно)
+### Firewall (required)
 
-Если на хосте активен UFW с политикой `deny incoming` (по умолчанию), mDNS (multicast) проходит, а TCP/631 — нет. Принтер тогда **виден** в списке AirPrint, но iOS не может открыть IPP-сессию и **прячет** его. Откройте порт для локальной сети:
+If the host runs UFW with a default `deny incoming` policy, mDNS (multicast) passes but TCP/631 does not. The printer then **appears** in the AirPrint list, but iOS cannot open an IPP session and **hides** it. Open the port for the local network:
 
 ```bash
 sudo ufw allow from <LAN_SUBNET> to any port 631 proto tcp
-# при необходимости явно и mDNS:
+# and, if needed, mDNS explicitly:
 sudo ufw allow from <LAN_SUBNET> to any port 5353 proto udp
 ```
 
-Проверка с другого хоста (Mac/Linux с CUPS): `ipptool -tv ipp://<server-ip>:631/printers/<PRINTER_NAME> get-printer-attributes.test` должен вернуть `successful-ok`.
+Verify from another host (Mac/Linux with CUPS): `ipptool -tv ipp://<server-ip>:631/printers/<PRINTER_NAME> get-printer-attributes.test` must return `successful-ok`.
 
-Если у хоста несколько интерфейсов в одной подсети (например, провод + Wi-Fi), укажите в `.env` только основной в `AVAHI_INTERFACES` (например, `enp2s0`), чтобы `home-server.local` не резолвился в несколько адресов.
+If the host has several interfaces on the same subnet (e.g. wired + Wi-Fi), set only the primary one in `AVAHI_INTERFACES` (e.g. `enp2s0`) so `<hostname>.local` does not resolve to multiple addresses.
 
-## Проверка и тестовая печать
+## Verification and test print
 
-Проверьте очередь: `make status`. Если она отображается как доступная, отправьте встроенную страницу CUPS: `make test`.
+Check the queue: `make status`. If it shows as available, submit the built-in CUPS test page: `make test`.
 
-На iPhone в той же локальной сети откройте PDF, выберите «Поделиться» → «Печать». Должно появиться имя из `AIRPRINT_NAME`.
+On an iPhone in the same LAN, open a PDF, choose Share → Print. The name from `AIRPRINT_NAME` should appear.
 
-## Обновление и восстановление
+## Updates and recovery
 
-Для обновления образов выполните `make down`, затем `make up`; именованные volumes CUPS сохранят очередь и задания. После обновления всегда выполните `make status` и `make test`.
+To update images run `make down`, then `make up`; the named CUPS volumes keep the queue and jobs. After an update always run `make status` and `make test`.
 
-Чтобы заново применить настройки очереди после изменения `PRINTER_URI` или `PRINTER_MODEL`, выполните `./scripts/install-printer.sh`. Скрипт идемпотентен.
+To re-apply queue settings after changing `PRINTER_URI` or `PRINTER_MODEL`, run `./scripts/install-printer.sh`. The script is idempotent.
 
-Не публикуйте TCP/631 в интернет и не коммитьте `.env`. Для диагностики используйте `make logs`; передавайте журналы только после удаления адресов и других локальных данных, если они чувствительны.
+Do not expose TCP/631 to the internet and do not commit `.env`. Use `make logs` for diagnostics; redact addresses and other local data before sharing logs if they are sensitive.
