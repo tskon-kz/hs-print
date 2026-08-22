@@ -2,17 +2,17 @@
 
 ## Project Structure & Module Organization
 
-This repository contains a Docker-based AirPrint gateway for an Epson L3250. Design documentation is in `docs/`:
+This repository contains a Docker-based AirPrint gateway for an Epson L3250. Documentation is in `docs/`:
 
-- `docs/implementation-plan.md` defines delivery stages and acceptance criteria.
 - `docs/architecture.md` describes CUPS, Avahi, host networking, and persistent state.
-- `docs/decisions.md` records assumptions that must be validated before deployment.
+- `docs/decisions.md` records the design decisions and rationale.
+- `docs/operations.md` covers deployment, verification, and troubleshooting.
 
-Implementation files will follow the documented layout: `compose.yaml`, `.env.example`, `Makefile`, `cups/`, `avahi/`, and `scripts/`. Keep component files together and operator checks in `scripts/`.
+Implementation follows the layout: `compose.yaml`, `.env.example`, `Makefile`, `cups/`, `avahi/`, and `scripts/`. Keep component files together and operator checks in `scripts/`.
 
 ## Build, Test, and Development Commands
 
-The Compose stack has not yet been implemented. When it is added, keep the documented Makefile interface stable:
+Keep the Makefile interface stable:
 
 - `make up` — build and start the gateway.
 - `make down` — stop the stack without deleting persistent printer state.
@@ -30,11 +30,11 @@ Keep settings configurable through `.env`; commit only `.env.example`. Never har
 
 ## Testing Guidelines
 
-Validate configuration parsing, then service health, then an actual print. Networking changes must verify mDNS discovery from an iPhone on the same LAN. Preserve the acceptance criteria in `docs/implementation-plan.md`.
+Validate configuration parsing, then service health, then an actual print. Networking changes must verify mDNS discovery from an iPhone on the same LAN. When a host firewall is active, confirm TCP/631 reachability with `ipptool` before assuming a discovery problem.
 
 ## Commit & Pull Request Guidelines
 
-There is no commit history yet, so use concise imperative commits such as `Add CUPS container configuration` or `Document recovery procedure`. Keep each commit focused. Pull requests should state the affected component, configuration changes, validation commands and outcomes, and any required router or iPhone checks. Include redacted logs or screenshots only when they help diagnose UI or discovery behavior.
+Use concise imperative commits such as `Add CUPS container configuration` or `Document recovery procedure`. Keep each commit focused. Pull requests should state the affected component, configuration changes, validation commands and outcomes, and any required router or iPhone checks. Include redacted logs or screenshots only when they help diagnose UI or discovery behavior.
 
 ## Security & Operations
 

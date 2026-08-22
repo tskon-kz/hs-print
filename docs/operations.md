@@ -10,6 +10,20 @@
 
 `network_mode: host` обязателен для обнаружения через Bonjour. Запускайте стек на Linux; Docker Desktop на macOS/Windows не воспроизводит сетевую модель целевого Ubuntu-хоста.
 
+### Firewall (обязательно)
+
+Если на хосте активен UFW с политикой `deny incoming` (по умолчанию), mDNS (multicast) проходит, а TCP/631 — нет. Принтер тогда **виден** в списке AirPrint, но iOS не может открыть IPP-сессию и **прячет** его. Откройте порт для локальной сети:
+
+```bash
+sudo ufw allow from <LAN_SUBNET> to any port 631 proto tcp
+# при необходимости явно и mDNS:
+sudo ufw allow from <LAN_SUBNET> to any port 5353 proto udp
+```
+
+Проверка с другого хоста (Mac/Linux с CUPS): `ipptool -tv ipp://<server-ip>:631/printers/<PRINTER_NAME> get-printer-attributes.test` должен вернуть `successful-ok`.
+
+Если у хоста несколько интерфейсов в одной подсети (например, провод + Wi-Fi), укажите в `.env` только основной в `AVAHI_INTERFACES` (например, `enp2s0`), чтобы `home-server.local` не резолвился в несколько адресов.
+
 ## Проверка и тестовая печать
 
 Проверьте очередь: `make status`. Если она отображается как доступная, отправьте встроенную страницу CUPS: `make test`.
