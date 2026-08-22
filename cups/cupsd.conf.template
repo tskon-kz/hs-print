@@ -36,7 +36,7 @@ WebInterface No
     Allow from ${LAN_SUBNET}
   </Limit>
 
-  <Limit Get-Printer-Attributes Get-Jobs Get-Job-Attributes Get-Subscriptions Get-Subscription-Attributes>
+  <Limit Get-Printer-Attributes Get-Jobs Get-Job-Attributes Get-Subscriptions Get-Subscription-Attributes CUPS-Get-PPDs>
     Order deny,allow
     Deny from all
     Allow from 127.0.0.1

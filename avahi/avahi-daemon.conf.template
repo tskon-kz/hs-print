@@ -11,6 +11,3 @@ publish-domain=yes
 
 [reflector]
 enable-reflector=no
-
-[dbus]
-enable-dbus=no
