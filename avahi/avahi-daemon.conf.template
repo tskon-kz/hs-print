@@ -9,6 +9,8 @@ ratelimit-burst=1000
 publish-hinfo=no
 publish-workstation=no
 publish-domain=yes
+# CUPS listens on IPv4 only; do not advertise AAAA so iOS connects over IPv4.
+publish-aaaa-on-ipv4=no
 
 [reflector]
 enable-reflector=no
