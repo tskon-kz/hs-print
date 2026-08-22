@@ -28,6 +28,6 @@ lpadmin -p "$PRINTER_NAME" -E -v "$PRINTER_URI" -m "$model" \
   -o printer-error-policy=retry-job \
   -o media=iso_a4_210x297mm
 cupsenable "$PRINTER_NAME"
-accept "$PRINTER_NAME"
+cupsaccept "$PRINTER_NAME"
 
 echo "Configured CUPS queue '$PRINTER_NAME' with '$PRINTER_URI' and '$model'."
