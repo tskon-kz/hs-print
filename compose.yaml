@@ -1,0 +1,43 @@
+name: hs-print
+
+services:
+  cups:
+    build:
+      context: ./cups
+    environment:
+      LAN_SUBNET: ${LAN_SUBNET:?copy .env.example to .env and set LAN_SUBNET}
+      PRINTER_NAME: ${PRINTER_NAME:?set PRINTER_NAME in .env}
+      PRINTER_MODEL: ${PRINTER_MODEL:-}
+      PRINTER_URI: ${PRINTER_URI:?set PRINTER_URI in .env}
+      TZ: ${TZ:-UTC}
+    healthcheck:
+      test: ["CMD-SHELL", "lpstat -r | grep -q 'scheduler is running'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - cups-config:/etc/cups
+      - cups-spool:/var/spool/cups
+      - cups-logs:/var/log/cups
+
+  avahi:
+    build:
+      context: ./avahi
+    depends_on:
+      cups:
+        condition: service_healthy
+    environment:
+      AIRPRINT_NAME: ${AIRPRINT_NAME:?set AIRPRINT_NAME in .env}
+      PRINTER_NAME: ${PRINTER_NAME:?set PRINTER_NAME in .env}
+      PRINTER_PRODUCT: ${PRINTER_PRODUCT:-Epson L3250}
+      TZ: ${TZ:-UTC}
+    network_mode: host
+    restart: unless-stopped
+
+volumes:
+  cups-config:
+  cups-spool:
+  cups-logs:
