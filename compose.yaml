@@ -33,6 +33,7 @@ services:
       AIRPRINT_NAME: ${AIRPRINT_NAME:?set AIRPRINT_NAME in .env}
       PRINTER_NAME: ${PRINTER_NAME:?set PRINTER_NAME in .env}
       PRINTER_PRODUCT: ${PRINTER_PRODUCT:-Epson L3250}
+      AVAHI_INTERFACES: ${AVAHI_INTERFACES:-}
       TZ: ${TZ:-UTC}
     network_mode: host
     restart: unless-stopped
